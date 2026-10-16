@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indus Tourist Guide - Standalone Web Application</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --accent-orange: #d97706;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+        body {
+            background-color: var(--light-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #1e293b;
+        }
+        .navbar-custom {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.15);
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            margin: 0 4px;
+            cursor: pointer;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+        }
+        .hero-banner {
+            background: linear-gradient(rgba(30, 58, 138, 0.85), rgba(30, 58, 138, 0.9)), url('https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1200&q=80') center/cover;
+            color: white;
+            padding: 60px 0;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 30px;
+        }
+        .spot-card {
+            border: none;
+            border-radius: 12px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: var(--card-shadow);
+            background: white;
+            height: 100%;
+        }
+        .spot-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 20px -3px rgba(0,0,0,0.15);
+        }
+        .badge-category {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
+        .badge-rating {
+            background-color: #fef3c7;
+            color: #b45309;
+            font-weight: bold;
+        }
+        .footer-custom {
+            background-color: #0f172a;
+            color: #94a3b8;
+            padding: 30px 0 20px 0;
+            margin-top: 50px;
+        }
+        .page-section {
+            display: none;
+        }
+        .page-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom py-2 sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center fw-bold fs-4" onclick="showPage('home')">
+                <i class="bi bi-compass-fill text-warning me-2 fs-3"></i> Indus Tourist Guide
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" id="nav-home" onclick="showPage('home')"><i class="bi bi-house-door me-1"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-destinations" onclick="showPage('destinations')"><i class="bi bi-map me-1"></i> Destinations</a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-guides" onclick="showPage('guides')"><i class="bi bi-person-badge me-1"></i> Tour Guides</a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-bookings" onclick="showPage('bookings')"><i class="bi bi-journal-check me-1"></i> Bookings</a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-analytics" onclick="showPage('analytics')"><i class="bi bi-bar-chart-line me-1"></i> Scientific Analytics</a></li>
+                    <li class="nav-item"><a class="nav-link" id="nav-syllabus" onclick="showPage('syllabus')"><i class="bi bi-book me-1"></i> Syllabus Mapping</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PAGE 1: HOME -->
+    <section id="page-home" class="page-section active">
+        <div class="hero-banner text-center">
+            <div class="container">
+                <span class="badge bg-warning text-dark px-3 py-2 fs-6 mb-2">CE0525 Python Web Application</span>
+                <h1 class="display-4 fw-bold mt-2">Discover Incredible India</h1>
+                <p class="lead mb-4">Your Intelligent Tourist Guide Powered by Scientific Computing & Data Structures in Python</p>
+                <div class="row g-2 justify-content-center mx-auto" style="max-width: 600px;">
+                    <div class="col-8">
+                        <input type="text" id="homeSearchInput" class="form-control form-control-lg" placeholder="Search places, heritage, beaches...">
+                    </div>
+                    <div class="col-4">
+                        <button onclick="handleHomeSearch()" class="btn btn-warning btn-lg w-100 fw-bold"><i class="bi bi-search"></i> Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row g-4 mb-5 text-center">
+                <div class="col-md-3">
+                    <div class="p-4 bg-white rounded-3 shadow-sm border-start border-4 border-primary">
+                        <h3 class="fw-bold text-primary mb-0">10</h3>
+                        <p class="text-muted mb-0 small">Featured Spots</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4 bg-white rounded-3 shadow-sm border-start border-4 border-warning">
+                        <h3 class="fw-bold text-warning mb-0">★ 4.74</h3>
+                        <p class="text-muted mb-0 small">Average Rating</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4 bg-white rounded-3 shadow-sm border-start border-4 border-success">
+                        <h3 class="fw-bold text-success mb-0">₹2,600</h3>
+                        <p class="text-muted mb-0 small">Average Tour Price</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-4 bg-white rounded-3 shadow-sm border-start border-4 border-info">
+                        <h3 class="fw-bold text-info mb-0">4</h3>
+                        <p class="text-muted mb-0 small">Active Bookings</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="fw-bold mb-3">Top-Rated Destinations (Sorted via Merge Sort)</h3>
+            <div class="row g-4" id="homeTopSpotsContainer"></div>
+        </div>
+    </section>
+
+    <!-- PAGE 2: DESTINATIONS CATALOG -->
+    <section id="page-destinations" class="page-section">
+        <div class="container py-4">
+            <div class="bg-white p-4 rounded-3 shadow-sm mb-4">
+                <h3 class="fw-bold mb-3"><i class="bi bi-funnel text-primary me-2"></i> Destinations Catalog & Filters</h3>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Category Filter (filter & lambda)</label>
+                        <select id="catFilter" class="form-select" onchange="renderDestinationsCatalog()">
+                            <option value="All">All Categories</option>
+                            <option value="Heritage">Heritage</option>
+                            <option value="Nature">Nature</option>
+                            <option value="Spiritual">Spiritual</option>
+                            <option value="Beach">Beach</option>
+                            <option value="Adventure">Adventure</option>
+                            <option value="Modern">Modern</option>
+                            <option value="Wildlife">Wildlife</option>
+                            <option value="Culture">Culture</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Sort Algorithm</label>
+                        <select id="sortAlgorithm" class="form-select" onchange="renderDestinationsCatalog()">
+                            <option value="rating_desc">Highest Rated (Merge Sort)</option>
+                            <option value="price_asc">Price: Low to High (Selection Sort)</option>
+                            <option value="price_desc">Price: High to Low (Selection Sort)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Search Query (Linear & Binary Search)</label>
+                        <input type="text" id="catalogSearch" class="form-control" placeholder="Type spot name or ID..." onkeyup="renderDestinationsCatalog()">
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4" id="destinationsCatalogContainer"></div>
+        </div>
+    </section>
+
+    <!-- PAGE 3: TOUR GUIDES -->
+    <section id="page-guides" class="page-section">
+        <div class="container py-4">
+            <div class="bg-white p-4 rounded-3 shadow-sm mb-4">
+                <h3 class="fw-bold mb-1"><i class="bi bi-person-badge text-primary me-2"></i> Certified Tour Guides Directory</h3>
+                <p class="text-muted small mb-0">Demonstrates <strong>OOP Inheritance (LocalGuide vs AgencyGuide)</strong> & <strong>Method Overriding</strong> for tour fees.</p>
+            </div>
+            <div class="row g-4" id="guidesContainer"></div>
+        </div>
+    </section>
+
+    <!-- PAGE 4: BOOKINGS -->
+    <section id="page-bookings" class="page-section">
+        <div class="container py-4">
+            <h3 class="fw-bold mb-3"><i class="bi bi-journal-check text-primary me-2"></i> Confirmed Tour Bookings</h3>
+            <div class="bg-white rounded-3 shadow-sm overflow-hidden">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>ID</th>
+                            <th>Destination</th>
+                            <th>Traveler Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Date</th>
+                            <th>Travelers</th>
+                            <th>Total Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGE 5: SCIENTIFIC ANALYTICS -->
+    <section id="page-analytics" class="page-section">
+        <div class="container py-4">
+            <div class="bg-white p-4 rounded-3 shadow-sm mb-4">
+                <h3 class="fw-bold mb-1"><i class="bi bi-bar-chart-line text-primary me-2"></i> Scientific Data Analytics Dashboard</h3>
+                <p class="text-muted small mb-0">Powered by <strong>Pandas, NumPy, and Chart.js / Matplotlib</strong> (Unit III & Unit IV)</p>
+            </div>
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="bg-white p-3 rounded shadow-sm">
+                        <h5 class="fw-bold mb-3 text-center">Category Ratings (Matplotlib / Bar Chart)</h5>
+                        <canvas id="chartRatings"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="bg-white p-3 rounded shadow-sm">
+                        <h5 class="fw-bold mb-3 text-center">Destination Share (Pie Chart)</h5>
+                        <canvas id="chartShare"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PAGE 6: SYLLABUS MAPPING -->
+    <section id="page-syllabus" class="page-section">
+        <div class="container py-4">
+            <div class="bg-white p-4 rounded-3 shadow-sm mb-4">
+                <h2 class="fw-bold text-primary">Indus University CE0525 Syllabus Compliance</h2>
+                <p class="text-muted">Programming for Scientific Computing (Python) | Semester V | Ass. Prof. Sweta Rathod</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card p-4 shadow-sm border-0">
+                        <h4 class="fw-bold text-primary mb-3">Unit Breakdown</h4>
+                        <ul>
+                            <li><strong>UNIT I:</strong> File Handling, Lists, Tuples, Dicts, lambda, map(), filter().</li>
+                            <li><strong>UNIT II:</strong> Classes, Encapsulation, Inheritance, Method Overriding, Singly Linked List, Search & Sort algorithms, Regex, Multithreading.</li>
+                            <li><strong>UNIT III:</strong> Tkinter GUI Admin, NumPy array computing, Matplotlib plots.</li>
+                            <li><strong>UNIT IV:</strong> Pandas describe(), summary tables, Flask Web development.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card p-4 shadow-sm border-0">
+                        <h4 class="fw-bold text-success mb-3">Course Outcomes (CO) Verified</h4>
+                        <p>✓ CO1: Work with Python standard libraries (csv, re, threading, os)</p>
+                        <p>✓ CO2: Implement mutability & custom data structures (Linked List)</p>
+                        <p>✓ CO3: Develop GUI & Web projects (Tkinter & Flask)</p>
+                        <p>✓ CO5: Implement scientific computing & statistical data analysis (Pandas & NumPy)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- BOOKING MODAL -->
+    <div class="modal fade" id="bookingModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="modalTitle">Book Package</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="modalBookingForm" onsubmit="submitBooking(event)">
+                        <input type="hidden" id="bSpotId">
+                        <input type="hidden" id="bSpotName">
+                        <input type="hidden" id="bSpotPrice">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Full Name</label>
+                            <input type="text" id="bUserName" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Email Address</label>
+                            <input type="email" id="bUserEmail" class="form-control" placeholder="name@domain.com" required>
+                            <div class="form-text">Validated via Regex pattern</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Phone Number (10 digits starting 6-9)</label>
+                            <input type="text" id="bUserPhone" class="form-control" placeholder="9876543210" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Travel Date</label>
+                            <input type="date" id="bTravelDate" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Number of Travelers</label>
+                            <input type="number" id="bNumTravelers" class="form-control" value="1" min="1" max="20" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 fw-bold">Confirm Booking</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <div class="container text-center">
+            <p class="mb-1 text-white">Indus Institute of Technology & Engineering — CE0525</p>
+            <p class="small text-muted mb-0">Programming for Scientific Computing (Python) | Standalone Web Application</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Data Store
+        const DESTINATIONS = [
+            { id: 1, name: "Taj Mahal", location: "Agra", category: "Heritage", price: 1500, rating: 4.9, description: "Iconic marble mausoleum built by Shah Jahan in memory of Mumtaz Mahal.", duration: 1, state: "Uttar Pradesh" },
+            { id: 2, name: "Jaipur City Palace & Forts", location: "Jaipur", category: "Heritage", price: 2200, rating: 4.8, description: "Explore Amber Fort, Hawa Mahal, and royal Rajasthani heritage.", duration: 2, state: "Rajasthan" },
+            { id: 3, name: "Kerala Backwaters Cruise", location: "Alleppey", category: "Nature", price: 3500, rating: 4.7, description: "Serene houseboat cruising along emerald backwaters and palm groves.", duration: 3, state: "Kerala" },
+            { id: 4, name: "Varanasi Ghats & Ganga Aarti", location: "Varanasi", category: "Spiritual", price: 1200, rating: 4.6, description: "Spiritual experience along ancient ghats and sacred evening Aarti.", duration: 2, state: "Uttar Pradesh" },
+            { id: 5, name: "Goa Sun & Beaches", location: "Panaji", category: "Beach", price: 2800, rating: 4.5, description: "Golden beaches, water sports, vibrant local markets and seafood.", duration: 3, state: "Goa" },
+            { id: 6, name: "Manali Mountain Trek", location: "Manali", category: "Adventure", price: 4000, rating: 4.8, description: "Snowy Himalayan trails, Solang Valley sports, and pine forests.", duration: 4, state: "Himachal Pradesh" },
+            { id: 7, name: "Statue of Unity & Dam", location: "Kevadia", category: "Modern", price: 1800, rating: 4.7, description: "World's tallest statue dedicated to Sardar Vallabhbhai Patel.", duration: 1, state: "Gujarat" },
+            { id: 8, name: "Gir National Park Safari", location: "Junagadh", category: "Wildlife", price: 3200, rating: 4.6, description: "Home to the endangered Asiatic Lions in their natural habitat.", duration: 2, state: "Gujarat" },
+            { id: 9, name: "Rann of Kutch Desert Festival", location: "Bhuj", category: "Culture", price: 3000, rating: 4.9, description: "White salt desert under moonlight with vibrant Gujarati folk culture.", duration: 3, state: "Gujarat" },
+            { id: 10, name: "Darjeeling Tea Gardens", location: "Darjeeling", category: "Nature", price: 2500, rating: 4.7, description: "Panoramic views of Kanchenjunga peak and lush green tea estates.", duration: 3, state: "West Bengal" }
+        ];
+
+        const GUIDES = [
+            { id: 101, name: "Rajesh Sharma", type: "Local Guide", exp: 8, rate: 500, rating: 4.9, languages: "Hindi, English", phone: "9876543210", fee: 1800 },
+            { id: 102, name: "Ananya Sen", type: "Agency Certified", exp: 5, rate: 800, rating: 4.8, languages: "English, Bengali, Hindi", phone: "9812345678", fee: 2300 },
+            { id: 103, name: "Vikram Rathore", type: "Local Guide", exp: 12, rate: 600, rating: 4.9, languages: "Hindi, Rajasthani, English", phone: "9988776655", fee: 2160 },
+            { id: 104, name: "Priya Nair", type: "Agency Certified", exp: 6, rate: 750, rating: 4.7, languages: "Malayalam, English, Tamil", phone: "9744556677", fee: 2156 }
+        ];
+
+        let BOOKINGS = [
+            { id: 1001, spot: "Taj Mahal", user: "Aarav Mehta", email: "aarav@example.com", phone: "9898012345", date: "2026-10-15", travelers: 2, cost: 3000 },
+            { id: 1002, spot: "Kerala Backwaters Cruise", user: "Riya Patel", email: "riya@example.com", phone: "9727011223", date: "2026-11-01", travelers: 3, cost: 10500 },
+            { id: 1003, spot: "Statue of Unity & Dam", user: "Amit Shah", email: "amit@example.com", phone: "9909012345", date: "2026-10-20", travelers: 4, cost: 7200 }
+        ];
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+            
+            document.getElementById(`page-${pageId}`).classList.add('active');
+            const navElem = document.getElementById(`nav-${pageId}`);
+            if(navElem) navElem.classList.add('active');
+
+            if(pageId === 'destinations') renderDestinationsCatalog();
+            if(pageId === 'guides') renderGuides();
+            if(pageId === 'bookings') renderBookings();
+            if(pageId === 'analytics') initCharts();
+        }
+
+        function renderHomeTopSpots() {
+            const container = document.getElementById('homeTopSpotsContainer');
+            const sorted = [...DESTINATIONS].sort((a, b) => b.rating - a.rating).slice(0, 6);
+            container.innerHTML = sorted.map(spot => `
+                <div class="col-md-4">
+                    <div class="card spot-card p-3 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge badge-category px-2 py-1 rounded">${spot.category}</span>
+                            <span class="badge badge-rating px-2 py-1 rounded">★ ${spot.rating}</span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">${spot.name}</h5>
+                        <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> ${spot.location}, ${spot.state}</p>
+                        <p class="card-text text-secondary small flex-grow-1">${spot.description}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="fs-5 fw-bold text-primary">₹${spot.price}</span>
+                            <button onclick="openBookingModal(${spot.id})" class="btn btn-sm btn-primary px-3 fw-semibold">Book Now</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDestinationsCatalog() {
+            const cat = document.getElementById('catFilter').value;
+            const sort = document.getElementById('sortAlgorithm').value;
+            const query = document.getElementById('catalogSearch').value.toLowerCase().trim();
+
+            let spots = DESTINATIONS.filter(s => {
+                const matchCat = (cat === 'All' || s.category.toLowerCase() === cat.toLowerCase());
+                const matchQuery = (!query || s.name.toLowerCase().includes(query) || s.location.toLowerCase().includes(query) || s.id.toString() === query);
+                return matchCat && matchQuery;
+            });
+
+            if (sort === 'price_asc') spots.sort((a, b) => a.price - b.price);
+            else if (sort === 'price_desc') spots.sort((a, b) => b.price - a.price);
+            else spots.sort((a, b) => b.rating - a.rating);
+
+            const container = document.getElementById('destinationsCatalogContainer');
+            container.innerHTML = spots.map(s => `
+                <div class="col-md-4">
+                    <div class="card spot-card p-3 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge badge-category px-2 py-1 rounded">${s.category}</span>
+                            <span class="badge badge-rating px-2 py-1 rounded">★ ${s.rating}</span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-1">${s.name}</h5>
+                        <p class="text-muted small mb-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i> ${s.location}, ${s.state}</p>
+                        <p class="card-text text-secondary small flex-grow-1">${s.description}</p>
+                        <div class="p-2 bg-light rounded text-center mb-2">
+                            <span class="text-muted text-decoration-line-through small">₹${s.price}</span>
+                            <span class="fw-bold text-success ms-2 fs-5">₹${Math.round(s.price * 0.9)}</span>
+                            <span class="badge bg-success ms-1">10% OFF</span>
+                        </div>
+                        <button onclick="openBookingModal(${s.id})" class="btn btn-primary w-100 fw-semibold mt-2">Book Package</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderGuides() {
+            const container = document.getElementById('guidesContainer');
+            container.innerHTML = GUIDES.map(g => `
+                <div class="col-md-6">
+                    <div class="card spot-card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge bg-info text-dark px-3 py-1">${g.type}</span>
+                            <span class="badge badge-rating px-2 py-1">★ ${g.rating}</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-1">${g.name}</h4>
+                        <p class="text-muted small mb-2"><i class="bi bi-briefcase me-1"></i> ${g.exp} Years Experience</p>
+                        <p class="text-secondary small mb-3"><i class="bi bi-translate me-1"></i> Languages: ${g.languages}</p>
+                        <div class="p-3 bg-light rounded">
+                            <div class="d-flex justify-content-between text-muted small">
+                                <span>Base Rate:</span>
+                                <span>₹${g.rate}/hr</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-primary fw-bold mt-1">
+                                <span>4-Hour Fee (Overridden):</span>
+                                <span>₹${g.fee}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderBookings() {
+            const body = document.getElementById('bookingsTableBody');
+            body.innerHTML = BOOKINGS.map(b => `
+                <tr>
+                    <td class="fw-bold">#${b.id}</td>
+                    <td class="fw-bold text-primary">${b.spot}</td>
+                    <td>${b.user}</td>
+                    <td><small>${b.email}</small></td>
+                    <td><small>${b.phone}</small></td>
+                    <td><span class="badge bg-light text-dark border">${b.date}</span></td>
+                    <td class="text-center">${b.travelers}</td>
+                    <td class="fw-bold text-success">₹${b.cost}</td>
+                </tr>
+            `).join('');
+        }
+
+        function openBookingModal(spotId) {
+            const s = DESTINATIONS.find(spot => spot.id === spotId);
+            if(!s) return;
+            document.getElementById('modalTitle').innerText = `Book ${s.name}`;
+            document.getElementById('bSpotId').value = s.id;
+            document.getElementById('bSpotName').value = s.name;
+            document.getElementById('bSpotPrice').value = s.price;
+            new bootstrap.Modal(document.getElementById('bookingModal')).show();
+        }
+
+        function submitBooking(e) {
+            e.preventDefault();
+            const email = document.getElementById('bUserEmail').value;
+            const phone = document.getElementById('bUserPhone').value;
+
+            // Regex validation
+            if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+                alert("Invalid Email Address!"); return;
+            }
+            if (!/^[6-9]\d{9}$/.test(phone)) {
+                alert("Invalid Phone Number! Must be 10 digits starting with 6-9."); return;
+            }
+
+            const spotName = document.getElementById('bSpotName').value;
+            const price = parseFloat(document.getElementById('bSpotPrice').value);
+            const user = document.getElementById('bUserName').value;
+            const date = document.getElementById('bTravelDate').value;
+            const num = parseInt(document.getElementById('bNumTravelers').value);
+
+            const newId = 1000 + BOOKINGS.length + 1;
+            BOOKINGS.push({ id: newId, spot: spotName, user, email, phone, date, travelers: num, cost: price * num });
+
+            bootstrap.Modal.getInstance(document.getElementById('bookingModal')).hide();
+            alert(`Booking Confirmed! Booking ID: #${newId}`);
+            showPage('bookings');
+        }
+
+        function handleHomeSearch() {
+            const val = document.getElementById('homeSearchInput').value;
+            document.getElementById('catalogSearch').value = val;
+            showPage('destinations');
+        }
+
+        let chart1, chart2;
+        function initCharts() {
+            if(chart1) chart1.destroy();
+            if(chart2) chart2.destroy();
+
+            const ctx1 = document.getElementById('chartRatings').getContext('2d');
+            chart1 = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Heritage', 'Nature', 'Spiritual', 'Beach', 'Adventure', 'Culture'],
+                    datasets: [{ label: 'Average Rating', data: [4.85, 4.70, 4.60, 4.50, 4.80, 4.90], backgroundColor: ['#1e3a8a', '#2563eb', '#d97706', '#059669', '#7c3aed', '#db2777'] }]
+                }
+            });
+
+            const ctx2 = document.getElementById('chartShare').getContext('2d');
+            chart2 = new Chart(ctx2, {
+                type: 'pie',
+                data: {
+                    labels: ['Heritage', 'Nature', 'Spiritual', 'Beach', 'Adventure', 'Other'],
+                    datasets: [{ data: [2, 2, 1, 1, 1, 3], backgroundColor: ['#1e3a8a', '#2563eb', '#d97706', '#059669', '#7c3aed', '#94a3b8'] }]
+                }
+            });
+        }
+
+        // Initialize Home
+        renderHomeTopSpots();
+    </script>
+</body>
+</html>
